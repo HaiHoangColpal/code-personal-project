@@ -1,0 +1,242 @@
+<style>
+  /* =================================================================== */
+  /* === PHIÊN BẢN CSS CUỐI CÙNG - SẠCH SẼ, GỌN GÀNG === */
+  /* =================================================================== */
+
+  /* --- 1. CÀI ĐẶT CHUNG --- */
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 600px;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  h1 {
+    color: #D93025;
+    text-align: center;
+    margin-bottom: 25px;
+  }
+
+  /* --- 2. BỐ CỤC FORM --- */
+  .form-row {
+    /* display: flex; */
+    display: grid;
+    /* Đổi từ flex sang grid */
+    grid-template-columns: repeat(3, 1fr);
+    /* Tạo ra một lưới có 3 cột bằng nhau */
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .form-row .form-group {
+    /* flex: 1; */
+    margin-bottom: 0;
+    /* min-width: 0; /* Rất quan trọng để không bị đè nhau */
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    font-size: 18px;
+    margin-bottom: 8px;
+    display: block;
+    font-weight: bold;
+  }
+
+  label span {
+    color: #D93025;
+  }
+
+  /* --- 3. STYLE CHO CÁC Ô INPUT THƯỜNG --- */
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="date"],
+  input[type="time"] {
+    width: 100%;
+    min-height: 50px;
+    padding: 15px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+  }
+
+  ::placeholder {
+    color: #a0aec0;
+    font-style: italic;
+  }
+
+  /* --- 4. STYLE CHO CÁC DROPDOWN XỊN (CHOICES.JS) --- */
+  /* Style chung cho tất cả dropdown có search */
+  .choices {
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+  .choices__inner {
+    width: 100%;
+    min-height: 50px !important;
+    padding: 0 15px !important;
+    border-radius: 8px !important;
+    background-color: white !important;
+    border: 1px solid #ccc !important;
+    font-size: 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+  }
+
+  .choices__inner .choices__item--selectable {
+    font-weight: bold !important;
+  }
+
+  .choices__list--dropdown .choices__input {
+    width: 100% !important;
+    background-color: #f7fafc !important;
+    padding: 10px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+
+  /* --- 5. STYLE "ĐỘ" RIÊNG CHO Ô CHỌN NHÁNH CHÍNH (TO & BỰ)--- */
+  #main-branch-group>label {
+    font-size: 22px !important;
+    text-align: center;
+    font-weight: 900 !important;
+    color: black;
+    margin-bottom: 15px;
+  }
+
+  #main-branch-group .choices__inner {
+    min-height: 75px !important;
+    /* <<-- MÀY CÓ THỂ TĂNG SỐ NÀY */
+    font-size: 22px !important;
+    /* <<-- VÀ SỐ NÀY ĐỂ NÓ TO HƠN */
+    font-weight: 500 !important;
+    border-color: #333 !important;
+    border-width: 2px !important;
+  }
+
+  /* Style khi ô chọn nhánh chính được chọn */
+  #main-branch-group .choices.is-selected .choices__inner {
+    background-color: #fff8f7 !important;
+    border-color: #D93025 !important;
+  }
+
+  /* --- 6. CÁC STYLE PHỤ KHÁC --- */
+  #submitBtn {
+    width: 100%;
+    min-height: 50px;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+  }
+
+  #submitBtn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+
+  #submitBtn:enabled {
+    background-color: #28a745;
+  }
+
+  #submitBtn:hover:enabled {
+    background-color: #218838;
+  }
+
+  .section-divider {
+    border-top: 2px solid #e2e8f0;
+    margin: 30px 0;
+  }
+
+  .detail-form-section {
+    display: none;
+  }
+
+  #status {
+    text-align: center;
+    margin-top: 15px;
+    font-weight: bold;
+    min-height: 20px;
+  }
+
+  .success {
+    color: #28a745;
+  }
+
+  .error {
+    color: #D93025;
+  }
+
+  .loading {
+    color: #007bff;
+  }
+
+  .form-note {
+    font-style: italic;
+    color: #666;
+    margin-bottom: 15px;
+    border-left: 3px solid #007bff;
+    padding-left: 10px;
+  }
+
+  /* === STYLE CHO CHỮ TRỢ GIÚP BÊN DƯỚI Ô INPUT === */
+  .form-helper-text {
+    font-size: 10px;
+    /* Cỡ chữ nhỏ */
+    color: #666;
+    /* Màu xám */
+    font-style: italic;
+    /* In nghiêng */
+    margin-top: 8px;
+    /* Khoảng cách với ô input ở trên */
+    margin-bottom: 0;
+    line-height: 1.4;
+    /* Giãn dòng một chút cho dễ đọc */
+  }
+
+
+  /* === STYLE CHO CÁC TRƯỜNG BỊ LỖI, CHƯA NHẬP === */
+  .form-group.is-invalid .choices__inner,
+  .form-group.is-invalid input[type="text"],
+  .form-group.is-invalid input[type="number"] {
+  border-color: #D93025 !important;
+  border-width: 2px !important;
+  }
+
+  .form-group.is-invalid label {
+  color: #D93025 !important;
+  }
+
+
+
+
+
+
+
+
+  </style>
