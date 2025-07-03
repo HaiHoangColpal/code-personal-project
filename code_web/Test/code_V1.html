@@ -1,0 +1,507 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f4f4f9; color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 600px; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
+    h1 { color: #D93025; text-align: center; margin-bottom: 25px; }
+    /* .form-group { margin-bottom: 20px; } */
+    /* Định dạng cho hàng chứa nhiều cột */
+    .form-row {
+        display: flex; /* Kích hoạt Flexbox, tự động xếp các mục con theo hàng ngang */
+        gap: 20px;     /* Tạo khoảng cách 20px giữa các mục con (giữa 2 cột) */
+        margin-bottom: 20px;
+    }
+
+    /* Ra lệnh cho mỗi mục con trong .form-row chiếm không gian bằng nhau */
+    .form-row .form-group {
+        flex: 1; /* Mỗi .form-group sẽ tự động co giãn để lấp đầy hàng */
+        margin-bottom: 0; /* Bỏ margin-bottom ở đây vì .form-row đã có rồi */
+        min-width: 0; /* Rất quan trọng: cho phép flex item co lại nhỏ hơn cả nội dung của nó */
+        flex-basis: 0;  /* Đảm bảo nó bắt đầu tính toán kích thước từ con số 0 */
+    }
+    /* Tăng kích thước chữ của nhãn (label) và khoảng cách với ô nhập liệu */
+    .form-group label {
+        font-size: 18px; /* Tăng cỡ chữ của nhãn, vd: 18px */
+        margin-bottom: 8px; /* Tăng khoảng cách dưới của nhãn */
+        display: block; /* Đảm bảo label chiếm 1 dòng riêng */
+    }
+    /* Đảm bảo các ô nhập liệu chiếm toàn bộ chiều rộng của cụm chứa nó */
+    .form-group select,
+    .form-group input {
+        width: 100%;
+    }
+
+    label { display: block; font-weight: bold; margin-bottom: 8px; }
+    label span { color: #D93025; }
+    input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+    input:focus, select:focus { border-color: #D93025; outline: none; }
+    #submitBtn { width: 100%; padding: 12px; border: none; border-radius: 4px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease; }
+    #submitBtn:disabled { background-color: #cccccc; cursor: not-allowed; }
+    #submitBtn:enabled { background-color: #28a745; }
+    #submitBtn:hover:enabled { background-color: #218838; }
+    /* Áp dụng cho nút submit của bạn, có thể là button, input type submit */
+    #submit-button, button[type="submit"] {
+        margin-top: 30px; /* Tạo khoảng cách 30px phía trên nút */
+    }
+
+    .section-divider {
+    border: none; /* Xóa style mặc định xấu xí */
+    border-top: 2px solid #e2e8f0; /* Tạo một đường kẻ mảnh, màu xám nhạt */
+    margin-top: 30px;    /* Khoảng cách phía trên vạch kẻ */
+    margin-bottom: 30px; /* Khoảng cách phía dưới vạch kẻ */
+    }
+    .detail-form-section { display: none; } /* Ẩn tất cả các form con mặc định */
+    #status { text-align: center; margin-top: 15px; font-weight: bold; min-height: 20px;}
+    .success { color: #28a745; }
+    .error { color: #D93025; }
+    .loading { color: #007bff; }
+    .form-note {
+    font-size: 0.9em; /* Kích thước chữ nhỏ hơn một chút */
+    font-style: italic; /* In nghiêng */
+    color: #666; /* Màu xám */
+    margin-bottom: 15px; /* Tạo khoảng cách với trường đầu tiên */
+    border-left: 3px solid #007bff; /* Thêm một đường kẻ trang trí */
+    padding-left: 10px; /* Thêm khoảng đệm bên trái */
+}
+
+    /* Áp dụng cho TẤT CẢ các ô nhập liệu, ô chọn, nút bấm */
+    select,
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    button {
+        width: 100%;             /* Chiếm toàn bộ chiều rộng của cột chứa nó */
+        padding: 15px;           /* Tăng vùng đệm bên trong -> ô sẽ cao và to hơn */
+        font-size: 16px;         /* Tăng cỡ chữ bên trong ô nhập liệu */
+        border: 1px solid #ccc;  /* Một đường viền mảnh cho đẹp */
+        border-radius: 8px;      /* Bo tròn các góc một chút cho mềm mại */
+        box-sizing: border-box;  /* Rất quan trọng: đảm bảo padding không làm vỡ layout */
+        min-height: 50px;        /* Đảm bảo chiều cao tối thiểu, dễ bấm hơn */
+    }
+
+    /* Tăng khoảng cách giữa các hàng form */
+    .form-group {
+        margin-bottom: 20px; /* Tạo khoảng cách 20px giữa các .form-group */
+    }
+
+    /* Tinh chỉnh riêng cho nút bấm để nổi bật hơn */
+    button, input[type="submit"] {
+        background-color: #007bff; /* Màu nền xanh dương */
+        color: white;              /* Chữ màu trắng */
+        font-weight: bold;         /* In đậm chữ */
+        cursor: pointer;           /* Biến con trỏ thành hình bàn tay */
+    }
+
+    button:hover, input[type="submit"]:hover {
+        background-color: #0056b3; /* Đổi màu nền khi di chuột qua */
+    }
+
+
+    /* Style cho màn hình từ tablet (768px) trở lên */
+    @media (min-width: 768px) {
+        .form-group label {
+            font-size: 18px;
+        }
+
+        select,
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        button {
+            padding: 15px;
+            font-size: 16px;
+            min-height: 50px;
+        }
+    }
+
+        /* Thêm class này vào để highlight dropdown đã chọn */
+      .selected-branch {
+        border-color: #D93025 !important; /* Dùng !important để nó ưu tiên đè lên style cũ */
+        border-width: 2px;
+        background-color: #fff8f7; /* Thêm tí màu nền hồng nhạt cho nó nổi */
+      }
+      /* Style cho chữ mờ placeholder */
+      ::placeholder {
+        color: #a0aec0;
+        font-style: italic;
+      }
+
+      /* In đậm chữ của lựa chọn đang được hiển thị trong dropdown Choices.js */
+      .choices__inner .choices__item--selectable {
+        font-weight: bold !important;
+      }
+
+      /* ================================================ */
+      /* === BỘ CSS HOÀN CHỈNH CHO CHOICES.JS === */
+      /* ================================================ */
+
+      /* Style cho cái khung bên ngoài của dropdown */
+      .choices__inner {
+        display: flex !important;
+        align-items: center !important; /* Căn giữa nội dung theo chiều dọc */
+        width: 100% !important;
+        min-height: 50px !important;       /* Ép chiều cao tối thiểu 50px */
+        padding: 0 15px !important;       /* Vùng đệm bên trong */
+        border-radius: 8px !important;      /* Bo góc 8px */
+        background-color: white !important;
+        border: 1px solid #ccc !important;
+        font-size: 16px !important;
+      }
+
+      /* Style cho dropdown khi nó được mở ra */
+      .is-open .choices__inner {
+        border-color: #D93025 !important;
+      }
+
+      /* Style cho ô gõ text tìm kiếm bên trong */
+      .choices__input {
+        font-size: 16px !important;         /* Đồng bộ cỡ chữ */
+        padding: 0 !important;
+        margin: 0 !important;
+        background-color: transparent !important;
+      }
+
+      /* Chỉnh lại chữ của mục đã được chọn (in đậm) */
+      .choices__item--selectable {
+        font-weight: bold !important;
+      }
+
+      /* Căn chỉnh lại vị trí dấu mũi tên đi xuống */
+      .choices[data-type*="select-one"]::after {
+        right: 15.5px;
+        margin-top: -5px;
+        border-width: 5px;
+        width: 100%;
+      }
+      .choices {
+      width: 100%;
+      }
+
+      /* === PHÓNG TO Ô SEARCH TRONG DROPDOWN === */
+      .choices__list--dropdown .choices__input,
+      .choices__list--single .choices__input {
+          width: 100% !important; /* Cho nó rộng ra hết cỡ */
+          background-color: #f7fafc !important; /* Thêm tí màu nền cho dễ thấy */
+          padding: 10px !important; /* Thêm padding cho dễ bấm */
+          border: 1px solid #ddd !important; /* Thêm viền */
+          border-radius: 4px;
+          margin-bottom: 8px; /* Khoảng cách với danh sách bên dưới */
+      }
+
+  </style>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  
+
+
+
+</head>
+<body>
+  <div class="container">
+    <h1>Form Kiểm kho Mixing/IM</h1>
+    <form id="mainForm" novalidate >
+      <div class="form-group">
+        <label for="nhanh">Thông tin nhập thêm là gì? <span>*</span></label>
+        <select id="nhanh" name="nhanh" required>
+          <option value="" disabled selected>-- Chọn một nhánh --</option>
+          <option value="Thùng Motan Vim">Thùng Motan Vim</option>
+          <option value="Tank máy HIM khu vực IM">Tank máy HIM khu vực IM</option>
+          <option value="Tank máy VIM khu vực IM">Tank máy VIM khu vực IM</option>
+          <option value="Nhựa phát ở khu vực IM">Nhựa phát ở khu vực IM</option>
+          <option value="Nhựa xả, runner">Nhựa xả, runner</option>
+          <option value="Nhựa Recycle">Nhựa Recycle</option>
+          <option value="Cụm máy ENGEL">Cụm máy ENGEL</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+<hr class="section-divider">
+        <p class="form-note">Ghi chú: Nếu trường hợp không có giá trị, vui lòng chọn "Không".</p>
+
+<!-- Các nhánh chính -->
+      <div id="form-motan-vim" class="detail-form-section">
+        <div class="form-row">
+          <div class="form-group"><label for="mayMotan">Máy <span>*</span></label>
+            <select id="mayMotan" name="mayMotan" required placeholder="Nhập máy"></select></div>
+          <div class="form-group"><label for="maHatMauMotan">Mã hạt màu<span>*</span></label>
+            <select id="maHatMauMotan" name="maHatMauMotan" required placeholder="Nhập mã M"></select></div>
+          <div class="form-group"><label for="klHatMauMotan">Khối lượng(kg) <span>*</span></label>
+            <input type="number" id="klHatMauMotan" name="klHatMauMotan" required  placeholder="12.5"></div>
+        </div>
+      </div>
+
+      <div id="form-nhua-phat" class="detail-form-section">
+        <div class="form-row">  
+          <div class="form-group"><label for="mayNhuaPhat">Máy <span>*</span></label>
+            <select id="mayNhuaPhat" name="mayNhuaPhat" required></select></div>
+          <div class="form-group"><label for="maNhuaPhat">Mã nhựa <span>*</span></label>
+            <select id="maNhuaPhat" name="maNhuaPhat" required></select></div>
+          <div class="form-group"><label for="soBaoNhuaPhat">Số bao <span>*</span></label>
+            <input type="number" id="soBaoNhuaPhat" name="soBaoNhuaPhat" required></div>
+        </div> 
+      </div> 
+      
+      <div id="form-nhua-recycle" class="detail-form-section">
+        <div class="form-row">
+          <div class="form-group"><label for="tenMay">Tên máy <span>*</span></label>
+            <select id="tenMay" name="tenMay" required></select></div>
+          <div class="form-group"><label for="tenBundle">Tên Bundle <span>*</span></label>
+            <select id="tenBundle" name="tenBundle" required></select></div>
+          <div>
+          </div>
+        </div>
+        <div class="form-row">    
+          <div class="form-group"><label for="maNhua1">Mã nhựa 1 <span>*</span></label>
+            <select id="maNhua1" name="maNhua1" required></select></div>
+          <div class="form-group"><label for="maNhua2">Mã nhựa 2 <span>*</span></label>
+            <select id="maNhua2" name="maNhua2" required></select></div>
+          <div class="form-group"><label for="maMau">Mã màu <span>*</span></label>
+            <select id="maMau" name="maMau" required></select></div>
+        </div>  
+        <div class="form-row">
+          <div class="form-group"><label for="khoiLuong">Khối lượng <span>*</span></label>
+            <input type="number" id="khoiLuong" name="khoiLuong" required></div>
+        </div>
+      </div>
+     
+      <div id="form-cum-may-engel" class="detail-form-section">
+        <div class="form-group">
+          <label for="tenMayEngel">Tên máy <span>*</span></label>
+          <select id="tenMayEngel" name="tenMayEngel" required></select></div>
+        <div class="form-group">
+          <label for="tenBundleEngel">Tên Bundle <span>*</span></label>
+          <select id="tenBundleEngel" name="tenBundleEngel" required></select></div>
+        <div class="form-group">
+          <label for="maNhua1Engel">Mã nhựa 1 <span>*</span></label>
+          <select id="maNhua1Engel" name="maNhua1Engel" required></select></div>
+        <div class="form-group">
+          <label for="maNhua2Engel">Mã nhựa 2 <span>*</span></label>
+          <select id="maNhua2Engel" name="maNhua2Engel" required></select></div>
+        <div class="form-group">
+          <label for="maMauEngel">Mã màu <span>*</span></label>
+          <select id="maMauEngel" name="maMauEngel" required></select></div>
+        <div class="form-group">
+          <label for="khoiLuongEngel">Khối lượng <span>*</span></label>
+          <input type="number" id="khoiLuongEngel" name="khoiLuongEngel" required></div>
+      </div>
+
+      <div id="form-other" class="detail-form-section">
+        <div class="form-group">
+          <label for="tenMayOther">Tên máy <span>*</span></label>
+          <select id="tenMayOther" name="tenMayOther" required></select></div>
+        <div class="form-group">
+          <label for="tenBundleOther">Tên Bundle <span>*</span></label>
+          <select id="tenBundleOther" name="tenBundleOther" required></select></div>
+        <div class="form-group">
+          <label for="maNhua1Other">Mã nhựa 1 <span>*</span></label>
+          <select id="maNhua1Other" name="maNhua1Other" required></select></div>
+        <div class="form-group">
+          <label for="maNhua2Other">Mã nhựa 2 <span>*</span></label>
+          <select id="maNhua2Other" name="maNhua2Other" required></select></div>
+        <div class="form-group">
+          <label for="maMauOther">Mã màu <span>*</span></label>
+          <select id="maMauOther" name="maMauOther" required></select></div>
+        <div class="form-group">
+          <label for="khoiLuongOther">Khối lượng <span>*</span></label>
+          <input type="number" id="khoiLuongOther" name="khoiLuongOther" required></div>
+        <div class="form-group">
+          <label for="thonTinOther">Thông tin chi tiết <span>*</span></label>
+          <input type="text" id="thonTinOther" name="thonTinOther" required></div>
+      </div>
+      
+      <div id="submit-section" style="display: none;">
+        <button type="submit" id="submitBtn" disabled>Gửi thông tin</button>
+        <div id="status"></div>
+      </div>
+    </form>
+  </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Lấy tất cả các element cần thiết
+  const form = document.getElementById('mainForm');
+  const nhanhSelect = document.getElementById('nhanh');
+  const submitSection = document.getElementById('submit-section');
+  const submitBtn = document.getElementById('submitBtn');
+  const statusDiv = document.getElementById('status');
+  const allDetailForms = document.querySelectorAll('.detail-form-section');
+
+  let choiceInstances = {};
+
+  // Hàm điền dữ liệu vào dropdown
+  function populateSelect(selectElement, options) {
+    if (!selectElement) return;
+
+      // Nếu dropdown này đã được nâng cấp, mình phải hủy nó đi trước khi điền dữ liệu mới
+    if (choiceInstances[selectElement.id]) {
+      choiceInstances[selectElement.id].destroy();
+    }
+
+    selectElement.innerHTML = '<option value="" disabled selected>-- Chọn --</option>';
+    options.forEach(option => {
+      const opt = document.createElement('option');
+      opt.value = option;
+      opt.textContent = option;
+      selectElement.appendChild(opt);
+    });
+
+
+      // Kích hoạt Choices.js cho dropdown này
+    const choices = new Choices(selectElement, {
+      searchEnabled: true, // Bật tính năng search
+      itemSelectText: 'Nhấn để chọn', // Chữ hiện ra khi hover
+      shouldSort: false, // Giữ nguyên thứ tự từ Google Sheet
+      searchPlaceholderValue: 'Nhập để tìm kiếm...',
+    });
+    
+    // Lưu lại để quản lý
+    choiceInstances[selectElement.id] = choices;
+  }
+
+  // Lấy dữ liệu dropdown từ backend khi tải trang
+  google.script.run
+    .withSuccessHandler(data => {
+      // Form Other
+      populateSelect(document.getElementById('tenMayOther'), data.may);
+      populateSelect(document.getElementById('tenBundleOther'), data.bundle);
+      populateSelect(document.getElementById('maNhua1Other'), data.nhua1);
+      populateSelect(document.getElementById('maNhua2Other'), data.nhua1);
+      populateSelect(document.getElementById('maMauOther'), data.mau);
+
+      // Form Engel
+      populateSelect(document.getElementById('tenMayEngel'), data.may);
+      populateSelect(document.getElementById('tenBundleEngel'), data.bundle);
+      populateSelect(document.getElementById('maNhua1Engel'), data.nhua1);
+      populateSelect(document.getElementById('maNhua2Engel'), data.nhua1);
+      populateSelect(document.getElementById('maMauEngel'), data.mau);
+      
+      // Form Recycle
+      populateSelect(document.getElementById('tenMay'), data.may);
+      populateSelect(document.getElementById('tenBundle'), data.bundle);
+      populateSelect(document.getElementById('maNhua1'), data.nhua1);
+      populateSelect(document.getElementById('maNhua2'), data.nhua1);
+      populateSelect(document.getElementById('maMau'), data.mau);
+      // Form Motan Vim
+      populateSelect(document.getElementById('mayMotan'), data.may);
+      populateSelect(document.getElementById('maHatMauMotan'), data.mau);
+      // Form Nhựa Phát
+      populateSelect(document.getElementById('mayNhuaPhat'), data.may);
+      populateSelect(document.getElementById('maNhuaPhat'), data.nhua1);
+    })
+    .getDropdownData();
+    
+  // Hàm kiểm tra validation thông minh
+  function validateForm() {
+    let isValid = true;
+    const activeForm = document.querySelector('.detail-form-section[style*="display: block"]');
+    if (activeForm) {
+      const requiredInputs = activeForm.querySelectorAll('[required]');
+      for (const input of requiredInputs) {
+        if (!input.value.trim()) {
+          isValid = false;
+          break;
+        }
+      }
+    } else {
+      isValid = false;
+    }
+    submitBtn.disabled = !isValid;
+  }
+
+  // BẮT SỰ KIỆN CHÍNH: KHI CHỌN NHÁNH
+  nhanhSelect.addEventListener('change', function() {
+    const selectedValue = this.value;
+    allDetailForms.forEach(f => f.style.display = 'none');
+    
+    let targetFormId = '';
+    switch (selectedValue) {
+      case 'Thùng Motan Vim':       targetFormId = 'form-motan-vim'; break;
+      case 'Nhựa phát ở khu vực IM': targetFormId = 'form-nhua-phat'; break;
+      case 'Nhựa Recycle':          targetFormId = 'form-nhua-recycle'; break;
+      case 'Cụm máy ENGEL':          targetFormId = 'form-cum-may-engel'; break;
+      case 'Other':          targetFormId = 'form-other'; break;
+    }
+
+    if (targetFormId) {
+      document.getElementById(targetFormId).style.display = 'block';
+      submitSection.style.display = 'block';
+            // === DÒNG MỚI 1: Thêm style 'màu đỏ' vào dropdown ===
+      nhanhSelect.classList.add('selected-branch');
+    } else {
+      submitSection.style.display = 'none';
+             // === DÒNG MỚI 2: Xóa style 'màu đỏ' nếu người dùng chọn lại dòng mặc định ===
+      nhanhSelect.classList.remove('selected-branch');
+    }
+    validateForm();
+  });
+  
+  // ===================================================================
+  // === DÒNG BỊ THIẾU NẰM ĐÂY NÈ BỒ TÈO!!! ===
+  // Lắng nghe sự kiện input trên toàn bộ form để kích hoạt nút submit
+  form.addEventListener('input', validateForm);
+  // ===================================================================
+
+  // Xử lý khi bấm nút SUBMIT
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    statusDiv.className = 'loading';
+    statusDiv.textContent = 'Đang gửi dữ liệu...';
+
+    const formData = {};
+    formData['nhanh'] = nhanhSelect.value;
+    const activeForm = document.querySelector('.detail-form-section[style*="display: block"]');
+    
+    if (activeForm) {
+      const inputs = activeForm.querySelectorAll('input, select');
+      inputs.forEach(input => {
+          // Với Choices.js, mình lấy giá trị từ instance của nó sẽ chính xác hơn
+      if (choiceInstances[input.id]) {
+        formData[input.name] = choiceInstances[input.id].getValue(true);
+      } else {
+        formData[input.name] = input.value;
+      }
+      });
+    }
+
+    console.log("Dữ liệu chuẩn bị gửi đi:", formData);
+
+    google.script.run
+      .withSuccessHandler(response => {
+        if (response.success) {
+          statusDiv.className = 'success';
+          statusDiv.textContent = response.message + ' Tự động làm mới sau 2 giây.';
+          setTimeout(() => {
+            form.reset();
+             // Reset các dropdown của Choices.js về trạng thái ban đầu
+            Object.values(choiceInstances).forEach(instance => {
+                if (document.body.contains(instance.element)) { // Kiểm tra xem element còn tồn tại không
+                    instance.clearStore();
+                    instance.clearInput();
+                }
+            });
+
+            allDetailForms.forEach(f => f.style.display = 'none');
+            submitSection.style.display = 'none';
+            statusDiv.textContent = '';
+            // === DÒNG MỚI 3: Xóa style 'màu đỏ' sau khi gửi thành công và reset form ===
+            nhanhSelect.classList.remove('selected-branch');
+            validateForm();
+          }, 2000);
+        } else {
+          throw new Error(response.message);
+        }
+      })
+      .withFailureHandler(err => {
+        statusDiv.className = 'error';
+        statusDiv.textContent = 'Lỗi: ' + err.message;
+        submitBtn.disabled = false;
+      })
+      .saveData(formData);
+  });
+});
+</script>
+</body>
+</html> -->

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <base target="_top">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <?!= HtmlService.createHtmlOutputFromFile('Form_Stock_Count_IM_MIXING_P2/Stylesheet').getContent(); ?>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Form Kiểm kho Mixing/IM</h1>
+    <form id="mainForm" novalidate>
+      <div class="form-group" id="main-branch-group">
+        <label for="nhanh">Thông tin nhập thêm là gì? <span>*</span></label>
+        <select id="nhanh" name="nhanh" required>
+        <option value="" hidden selected>-- Chọn một nhánh --</option> <!-- disabled selected -->
+        <option value="form-motan-vim"       data-branch-key="MotanVim">Thùng Motan Vim</option>
+        <option value="form-tank-him-im"     data-branch-key="TankHIM">Tank máy HIM khu vực IM</option>
+        <option value="form-tank-vim-im"     data-branch-key="TankVIM">Tank máy VIM khu vực IM</option>
+        <option value="form-nhua-phat"       data-branch-key="NhuaPhat">Nhựa phát ở khu vực IM</option>
+        <option value="form-nhua-runner"     data-branch-key="NhuaRunner">Nhựa xả, runner</option>
+        <option value="form-nhua-recycle"    data-branch-key="NhuaRecycle">Nhựa Recycle</option>
+        <option value="form-cum-may-engel"   data-branch-key="Engel">Cụm máy ENGEL</option>
+        <option value="form-other"           data-branch-key="Other">Other</option>
+      </select>
+      </div>
+
+      <hr class="section-divider">
+      <p class="form-note">Ghi chú: Nếu trường hợp không có giá trị, vui lòng chọn "Không".</p>
+      <br>
+          <!-- Các nhánh layout chính -->
+          <!-- Motan VIM -->
+      <div id="form-motan-vim" class="detail-form-section"><?!= inc('Form_Stock_Count_IM_MIXING_P2/Layout_Motan'); ?></div>
+          <!-- Tank máy HIM khu vực IM -->
+      <div id="form-tank-him-im" class="detail-form-section"><?!= inc('Form_Stock_Count_IM_MIXING_P2/Layout_TankHIM_IM'); ?></div>
+          <!-- Tank máy VIM khu vực IM -->
+      <div id="form-tank-vim-im" class="detail-form-section"><?!= inc('Form_Stock_Count_IM_MIXING_P2/Layout_TankVIM_IM'); ?></div>
+          <!-- Nhựa phát -->
+      <div id="form-nhua-phat" class="detail-form-section"><?!= inc('Form_Stock_Count_IM_MIXING_P2/Layout_NhuaPhat'); ?></div>
+          <!-- Nhựa xả, runner -->
+      <div id="form-nhua-runner" class="detail-form-section"><?!= inc('Form_Stock_Count_IM_MIXING_P2/Layout_NhuaXa_Runner'); ?></div>
+          <!-- Nhựa recycle -->
+      <div id="form-nhua-recycle" class="detail-form-section"><?!= inc('Form_Stock_Count_IM_MIXING_P2/Layout_Nhua_Recycle'); ?></div>
+          <!-- Engel -->
+      <div id="form-cum-may-engel" class="detail-form-section"><?!= inc('Form_Stock_Count_IM_MIXING_P2/Layout_CumEngel'); ?></div>
+          <!-- Other -->
+      <div id="form-other" class="detail-form-section"><?!= inc('Form_Stock_Count_IM_MIXING_P2/Layout_Others'); ?></div>
+
+      <div id="submit-section" style="display: none;">
+        <button type="submit" id="submitBtn" disabled>Gửi thông tin</button>
+        <div id="status"></div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+
+
+  /**
+ * 'DOMContentLoaded' là một sự kiện của trình duyệt.
+ * Nó đảm bảo rằng toàn bộ code bên trong chỉ chạy KHI và CHỈ KHI
+ * cây HTML đã được tải xong hoàn toàn. Điều này tránh các lỗi
+ * như "getElementById(null)" vì script chạy trước khi HTML xuất hiện.
+ */
+
+  // --- 1. KHAI BÁO CÁC BIẾN TOÀN CỤC ---
+  // Lấy một lần và dùng nhiều lần, rất hiệu quả.
+
+    document.addEventListener('DOMContentLoaded', function() {
+  // Lấy tất cả các element cần thiết
+  const form = document.getElementById('mainForm');
+  const nhanhSelect = document.getElementById('nhanh');
+  const submitSection = document.getElementById('submit-section');
+  const submitBtn = document.getElementById('submitBtn');
+  const statusDiv = document.getElementById('status');
+  // Lấy TẤT CẢ các div layout con, nó sẽ trả về một danh sách (NodeList)
+  const allDetailForms = document.querySelectorAll('.detail-form-section');
+
+  const mainBranchChoices = new Choices(nhanhSelect, {
+    shouldSort: false, // Giữ nguyên thứ tự các nhánh
+    searchEnabled: false // Cái này không cần search, chỉ cần đẹp là chính
+  });
+
+
+  let choiceInstances = {};
+  // let selectedNhanhValue = ""; // Biến mới để lưu tên nhánh đã chọn
+
+  // --- 2. CÁC HÀM TIỆN ÍCH ---
+  /**
+   * Hàm này dùng để điền dữ liệu (options) vào một thẻ <select>
+   * và nâng cấp nó thành dropdown "xịn" có tìm kiếm bằng Choices.js.
+   * @param {HTMLElement} selectElement - Element <select> cần điền dữ liệu.
+   * @param {string[]} options - Mảng các chuỗi để làm <option>.
+   */
+  // Hàm điền dữ liệu vào dropdown
+  function populateSelect(selectElement, options) {
+    if (!selectElement) return;
+
+      // Nếu dropdown này đã được nâng cấp, mình phải hủy nó đi trước khi điền dữ liệu mới
+    if (choiceInstances[selectElement.id]) {
+      choiceInstances[selectElement.id].destroy();
+    }
+
+    // Xóa hết option cũ và thêm dòng placeholder mặc định
+    selectElement.innerHTML = '<option value="" hidden selected>-- Chọn --</option>'; //disabled
+    // Lặp qua mảng dữ liệu và tạo từng <option>
+    options.forEach(option => {
+      const opt = document.createElement('option');
+      opt.value = option;
+      opt.textContent = option;
+      selectElement.appendChild(opt);
+    });
+
+
+      // Kích hoạt Choices.js cho dropdown này
+    const choices = new Choices(selectElement, {
+      searchEnabled: true, // Bật tính năng search
+      itemSelectText: 'Nhấn để chọn', // Chữ hiện ra khi hover
+      shouldSort: false, // Giữ nguyên thứ tự từ Google Sheet
+      searchPlaceholderValue: 'Nhập để tìm kiếm...',
+    });
+    
+    // Lưu lại để quản lý
+    choiceInstances[selectElement.id] = choices;
+  }
+
+
+// Đặt "bản đồ" này bên ngoài, ngay sau các biến toàn cục.
+const dropdownConfig = {
+  // id_của_thẻ_select: 'key_của_dữ_liệu_trong_object_data'
+  
+  // Form Other
+  'tenMayOther': 'may',
+  'tenBundleOther': 'bundle',
+  'maNhua1Other': 'nhua1',
+  'maNhua2Other': 'nhua1', // Dùng chung data.nhua1
+  'maMauOther': 'mau',
+
+  // Form Engel
+  'tenMayEngel': 'cumEngel',
+  'tenBundleEngel': 'bundleEngel',
+  'maNhua1Engel': 'nhua1',
+  'maNhua2Engel': 'nhua1',
+  'maMauEngel': 'mau',
+  
+  // Form Nhựa Phát
+  'mayNhuaPhat': 'may',
+  'maNhuaPhat': 'nhua1',
+
+  // Form Nhựa xả, runner
+  'tenBundleRunner': 'bundle',
+  'maNhua1Runner': 'nhua1',
+  'maNhua2Runner': 'nhua1',
+  'maMauRunner': 'mau',
+
+  // Form Recycle
+  'tenMay': 'may',
+  'tenBundle': 'bundle',
+  'maNhua1': 'nhua1',
+  'maNhua2': 'nhua1',
+  'maMau': 'mau',
+
+  // Form Tank Vim Im
+  'tenMayTankVim': 'may',
+  'tenBundleTankVim': 'bundle',
+  'mauBundleTankVim': 'mauBundle',
+  'maMauTankVim': 'mau',
+
+  // Form Tank Him Im
+  'tenMayTankHim': 'may',
+  'tenBundleTankHim': 'bundle',
+  'maNhuaTankHim': 'maNhuaHIM',
+  'maMauTankHim': 'mau',
+
+  // Form Motan Vim
+  'mayMotan': 'may',
+  'maHatMauMotan': 'mau'
+};
+
+// Đoạn code mới, siêu ngắn gọn
+google.script.run
+  .withSuccessHandler(data => {
+    // Lặp qua từng key trong bản đồ cấu hình (ví dụ: 'tenMayOther', 'tenBundleOther',...)
+    for (const selectId in dropdownConfig) {
+      // Lấy ra key của dữ liệu tương ứng (ví dụ: 'may', 'bundle')
+      const dataKey = dropdownConfig[selectId];
+      
+      // Tìm element select trong HTML bằng ID
+      const element = document.getElementById(selectId);
+      
+      // Nếu element tồn tại và có dữ liệu tương ứng thì gọi hàm populateSelect
+      if (element && data[dataKey]) {
+        populateSelect(element, data[dataKey]);
+      }
+    }
+  })
+  .getDropdownData();
+
+
+  /**
+   * Hàm này kiểm tra xem TẤT CẢ các trường `required` trong layout ĐANG HIỂN THỊ
+   * đã được điền hay chưa.
+   * Mục đích: bật/tắt nút Gửi thông tin.
+   */
+
+// Trong file Javascript.html, thay thế TOÀN BỘ hàm validateForm cũ bằng hàm này
+function validateForm() {
+    let isFormCompletelyValid = true; // Biến để quyết định cuối cùng
+    const activeForm = document.querySelector('.detail-form-section[style*="display: block"]');
+    
+    if (activeForm) {
+        const requiredInputs = activeForm.querySelectorAll('[required]');
+        
+        // Dùng forEach để duyệt qua TẤT CẢ các trường, không dừng lại sớm
+        requiredInputs.forEach(input => {
+            let value = '';
+            let isInputValid = false;
+            
+            // Lấy giá trị một cách chính xác
+            if (choiceInstances[input.id]) {
+                value = choiceInstances[input.id].getValue(true);
+            } else {
+                value = input.value;
+            }
+            
+            // Kiểm tra xem input có giá trị hay không
+            if (value || value === 0) { // Chấp nhận cả số 0 là hợp lệ
+                isInputValid = true;
+            }
+
+            // Tìm đến thẻ .form-group bao ngoài để tô màu
+            const fieldContainer = input.closest('.form-group');
+            if (!fieldContainer) return;
+
+            // Dựa vào kết quả để tô màu hoặc xóa màu
+            if (isInputValid) {
+                fieldContainer.classList.remove('is-invalid');
+            } else {
+                fieldContainer.classList.add('is-invalid');
+                isFormCompletelyValid = false; // Nếu có dù chỉ 1 trường lỗi, cả form sẽ lỗi
+            }
+        });
+    } else {
+        isFormCompletelyValid = false;
+    }
+
+    // Chỉ bật nút khi TOÀN BỘ form hợp lệ
+    submitBtn.disabled = !isFormCompletelyValid;
+}
+
+
+
+
+   // --- 4. CÁC BỘ LẮNG NGHE SỰ KIỆN (EVENT LISTENERS) ---
+  /**
+   * SỰ KIỆN QUAN TRỌNG NHẤT: Khi người dùng chọn một nhánh trong dropdown chính.
+   */
+  // BẮT SỰ KIỆN CHÍNH: KHI CHỌN NHÁNH
+  nhanhSelect.addEventListener('change', function() {
+    // alert('Hello')
+    const selectedValue = this.value; // Lấy value của option đã chọn (ví dụ: "ThungMotanVim")
+
+    // nhanhSelectChange(selectedValue);
+    // Đầu tiên, ẩn tất cả các layout con đi
+    allDetailForms.forEach(f => f.style.display = 'none');
+
+    // === THAY THẾ TOÀN BỘ SWITCH-CASE BẰNG DÒNG NÀY ===
+    const targetFormId = this.value; // Lấy thẳng ID từ value của option đã chọn
+    if (targetFormId) {
+      document.getElementById(targetFormId).style.display = 'block';
+      submitSection.style.display = 'block';
+            // === DÒNG MỚI 1: Thêm style 'màu đỏ' vào dropdown ===
+      nhanhSelect.parentElement.classList.add('selected-branch');
+    } else {
+      submitSection.style.display = 'none';
+             // === DÒNG MỚI 2: Xóa style 'màu đỏ' nếu người dùng chọn lại dòng mặc định ===
+      nhanhSelect.parentElement.classList.remove('selected-branch');
+    }
+    validateForm();
+  });
+
+  
+  // ===================================================================
+  // === DÒNG BỊ THIẾU NẰM ĐÂY NÈ BỒ TÈO!!! ===
+  // Lắng nghe sự kiện input trên toàn bộ form để kích hoạt nút submit
+  form.addEventListener('input', validateForm);
+  // ===================================================================
+
+  // Xử lý khi bấm nút SUBMIT
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    statusDiv.className = 'loading';
+    statusDiv.textContent = 'Đang gửi dữ liệu...';
+
+    // --- PHẦN SỬA ĐỔI ---
+    const formData = {};
+    
+    // 1. Lấy ra cái thẻ <option> đang được chọn
+    const selectedOption = nhanhSelect.options[nhanhSelect.selectedIndex];
+    
+    // 2. Lấy "mật mã" từ thuộc tính data-branch-key và nhét vào formData
+    formData['branchKey'] = selectedOption.dataset.branchKey;
+    // --- KẾT THÚC SỬA ĐỔI ---
+
+    // const formData = {};
+    // formData['nhanh'] = nhanhSelect.value;
+    const activeForm = document.querySelector('.detail-form-section[style*="display: block"]');
+    
+    if (activeForm) {
+      const inputs = activeForm.querySelectorAll('input, select');
+      inputs.forEach(input => {
+          // Với Choices.js, mình lấy giá trị từ instance của nó sẽ chính xác hơn
+      if (choiceInstances[input.id]) {
+        formData[input.name] = choiceInstances[input.id].getValue(true);
+      } else {
+        formData[input.name] = input.value;
+      }
+      });
+    }
+    console.log("Dữ liệu chuẩn bị gửi đi:", formData);
+
+
+
+  // --- 3. GỌI DỮ LIỆU TỪ GOOGLE SHEET ---
+  /**
+   * Dùng `google.script.run` để gọi hàm `getDropdownData` bên phía server (Code.gs).
+   * `.withSuccessHandler(data => { ... })`: Nếu gọi thành công, hàm này sẽ chạy,
+   * `data` chính là đối tượng mà hàm `getDropdownData` trả về.
+   */
+    google.script.run
+      .withSuccessHandler(response => {
+      // Dùng hàm populateSelect để điền dữ liệu vào từng dropdown
+      // Ví dụ cho layout Motan
+        if (response.success) {
+          statusDiv.className = 'success';
+          statusDiv.textContent = response.message //+ ' Tự động làm mới sau 1 giây.';
+          setTimeout(() => {
+            form.reset();
+             // Reset các dropdown của Choices.js về trạng thái ban đầu
+            Object.values(choiceInstances).forEach(instance => {
+                if (document.body.contains(instance.element)) { // Kiểm tra xem element còn tồn tại không
+                    // instance.clearStore();
+                    instance.clearInput();
+                }
+            });
+
+            mainBranchChoices.setChoiceByValue(''); // Lệnh này sẽ chọn lại dòng placeholder
+            
+            // 3. Dọn dẹp giao diện
+            allDetailForms.forEach(f => f.style.display = 'none');
+            submitSection.style.display = 'none';
+            statusDiv.textContent = '';
+            // === DÒNG MỚI 3: Xóa style 'màu đỏ' sau khi gửi thành công và reset form ===
+            // nhanhSelect.classList.remove('selected-branch');
+            nhanhSelect.parentElement.classList.remove('selected-branch'); // <== LỘT TEM
+            validateForm();
+          }, 1000);
+        } else {
+          throw new Error(response.message);
+        }
+      })
+      .withFailureHandler(err => {
+        statusDiv.className = 'error';
+        statusDiv.textContent = 'Lỗi: ' + err.message;
+        submitBtn.disabled = false;
+      })
+      .saveData(formData);
+  });
+});
+  </script>
+</body>
+
+</html>
