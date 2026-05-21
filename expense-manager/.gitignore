@@ -26,6 +26,7 @@ desktop.ini
 .env
 .env.local
 .env.*.local
+gas/Config.gs
 
 # Logs
 npm-debug.log*

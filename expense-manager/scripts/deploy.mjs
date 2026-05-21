@@ -62,7 +62,7 @@ const robocopyCmd = [
   `"${DEST}"`,
   '/E /MIR',                                   // mirror entire tree
   '/XD node_modules dist .git',                // skip dirs
-  '/XF .clasp.json tsconfig.app.tsbuildinfo',  // skip files
+  '/XF .clasp.json tsconfig.app.tsbuildinfo Config.gs',  // skip files (secrets)
 ].join(' ');
 try {
   run(robocopyCmd);
@@ -71,17 +71,8 @@ try {
   if (e.status >= 8) throw e;
 }
 
-// Sanitize SPREADSHEET_ID in the copied Code.gs
-const codeGsPath = path.join(DEST, 'gas', 'Code.gs');
-if (fs.existsSync(codeGsPath)) {
-  let content = fs.readFileSync(codeGsPath, 'utf8');
-  content = content.replace(
-    /const SPREADSHEET_ID = '[^']*'/,
-    "const SPREADSHEET_ID = ''"
-  );
-  fs.writeFileSync(codeGsPath, content, 'utf8');
-  console.log('🔒 Sanitized SPREADSHEET_ID in GitHub copy');
-}
+// Config.gs chứa secrets, đã nằm trong .gitignore → không cần sanitize
+console.log('🔒 Secrets tách riêng trong Config.gs (gitignored)');
 
 // ── Step 4: Git commit & push ───────────────────────────────────────
 log('Step 4/4: Git commit & push');
