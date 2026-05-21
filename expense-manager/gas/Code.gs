@@ -3,11 +3,11 @@
 // Deploy: Deploy > New deployment > Web app
 // ===================================================================
 
-const SPREADSHEET_ID = ''; // <-- Dán ID Google Sheet của bạn vào đây (lấy từ URL: docs.google.com/spreadsheets/d/{ID}/edit)
+// Secrets nằm trong Config.gs (gitignored) — xem Config.gs.example để tạo
 
 function getSpreadsheet() {
-  if (SPREADSHEET_ID) {
-    return SpreadsheetApp.openById(SPREADSHEET_ID);
+  if (typeof CONFIG !== 'undefined' && CONFIG.SPREADSHEET_ID) {
+    return SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
   }
   return SpreadsheetApp.getActiveSpreadsheet();
 }

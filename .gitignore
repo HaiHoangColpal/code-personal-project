@@ -28,6 +28,7 @@ expense-manager/gas/Index.html
 .env
 .env.local
 .env.*.local
+**/Config.gs
 
 # Logs
 npm-debug.log*

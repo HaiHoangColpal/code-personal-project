@@ -1,0 +1,9 @@
+// ===================================================================
+// Copy file này thành Config.gs và điền ID/secrets của bạn vào
+// Command: copy Config.gs.example Config.gs
+// ===================================================================
+
+var CONFIG = {
+  SPREADSHEET_ID: '', // Lấy từ URL: docs.google.com/spreadsheets/d/{ID}/edit
+  // GEMINI_API_KEY: '',
+};
