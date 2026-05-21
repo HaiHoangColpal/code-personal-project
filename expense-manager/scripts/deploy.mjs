@@ -43,17 +43,9 @@ if (!fs.existsSync(path.join(MONOREPO_PATH, '.git'))) {
   run(`git clone https://github.com/HaiHoangColpal/code-personal-project.git "${MONOREPO_PATH}"`);
 }
 
-// Pull latest
+// Pull latest main
 run('git checkout main', MONOREPO_PATH);
 run('git pull origin main', MONOREPO_PATH);
-
-// Switch to feature branch (or create)
-try {
-  run('git checkout feature/expense-manager', MONOREPO_PATH);
-  run('git pull origin feature/expense-manager', MONOREPO_PATH);
-} catch {
-  run('git checkout -b feature/expense-manager', MONOREPO_PATH);
-}
 
 // Robocopy source → monorepo (exclude build artifacts, secrets, deps)
 const robocopyCmd = [
@@ -88,8 +80,8 @@ try {
   const timestamp = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
   const msg = `deploy: expense-manager update (${timestamp})`;
   run(`git commit -m "${msg}"`, MONOREPO_PATH);
-  run('git push origin feature/expense-manager', MONOREPO_PATH);
-  console.log('✅ Pushed to GitHub: feature/expense-manager');
+  run('git push origin main', MONOREPO_PATH);
+  console.log('✅ Pushed to GitHub: main');
 }
 
 console.log('\n🎉 Deploy hoàn tất! GAS + GitHub đã đồng bộ.\n');
