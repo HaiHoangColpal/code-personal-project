@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "bundle": "node scripts/bundle.mjs",
-    "deploy": "npm run bundle && npx @google/clasp push"
+    "deploy": "node scripts/deploy.mjs",
+    "deploy:gas": "npm run bundle && npx @google/clasp push"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.0",
