@@ -1,0 +1,33 @@
+# === Global ignores cho tất cả project ===
+
+# Google Apps Script credentials (chứa scriptId cá nhân)
+**/.clasp.json
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
+# === expense-manager specific ===
+
+# Dependencies
+expense-manager/node_modules/
+
+# Build output
+expense-manager/dist/
+expense-manager/tsconfig.app.tsbuildinfo
+
+# Generated HTML cho GAS (build artifact)
+expense-manager/gas/Index.html
+
+# Environment / Secrets
+.env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*

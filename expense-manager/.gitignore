@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+tsconfig.app.tsbuildinfo
+
+# Google Apps Script (chứa scriptId cá nhân)
+.clasp.json
+
+# Generated HTML cho GAS (build artifact, không cần track)
+gas/Index.html
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment / Secrets
+.env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
