@@ -46,7 +46,7 @@ const normalizeText = (str: string): string => {
 const OVERRIDE_RULES = [
   {
     jar: "EDU", // Lọ Giáo dục
-    regex: /\b(hoc phi|khoa hoc|tien hoc|mua sach|sach giao khoa|hoc them|dao tao)\b/
+    regex: /\b(hoc phi|khoa hoc|tien hoc|mua sach|sach giao khoa|hoc them|dao tao|ky nang)\b/
   },
   {
     jar: "FFA", // Lọ Tự do Tài chính
@@ -64,7 +64,7 @@ const OVERRIDE_RULES = [
   },
   {
     jar: "PLAY", // Lọ Hưởng thụ
-    regex: /\b(nhau|an nhau|tiec|buffet|nha hang|bo nuong|banh kem|cafe|bar|pub|tra sua|giai tri|xem phim|du lich|spa|lam dep|vay|dam|skirt|my pham|hoi thao|the thao|gym|cuoi|dam cuoi|day thang|sinh nhat)\b/
+    regex: /\b(nhau|an nhau|tiec|buffet|nha hang|lien hoan|bo nuong|banh kem|cafe|bar|pub|tra sua|giai tri|xem phim|du lich|spa|lam dep|vay|dam|skirt|my pham|hoi thao|the thao|gym|cuoi|dam cuoi|an cuoi|day thang|sinh nhat)\b/
   }
 ];
 
@@ -91,7 +91,7 @@ const mapToJar = (categoryName: string, description: string): string => {
 
   // BƯỚC 3: MẶC ĐỊNH BẢO VỆ (SAFE FALLBACK)
   // Xử lý các category chung chung (Tiền ăn, tiền nhà, hóa đơn, bỉm sữa, xăng xe)
-  const isNecCategory = /\b(an uong|di lai|nha o|hoa don|dien nuoc|internet|wifi|sieu thi|di cho|xang|gui xe|bim|sua|thit|ca|rau|ngan hang|tra no|tien lai)\b/;
+  const isNecCategory = /\b(an uong|di lai|nha o|hoa don|dien nuoc|internet|wifi|sieu thi|di cho|xang|gui xe|đi cưới trả|trả cưới|bim|sua|thit|ca|rau|ngan hang|tra no|tien lai)\b/;
   
   // 1. NEC - Lọ Thiết yếu (55%): Dành cho sinh tồn cơ bản. Bao gồm tiền ăn uống, đi chợ, điện nước, xăng xe, nhà ở, trả góp ngân hàng hàng tháng.
   if (isNecCategory.test(normCategory) || isNecCategory.test(normDesc)) {
