@@ -19,40 +19,115 @@ const JARS = [
 //   - FFA (10%): Đầu tư sinh lời, tạo thu nhập thụ động (không bao giờ tiêu gốc).
 //   - LTSS (10%): Tích lũy cho các khoản chi tiêu lớn trong tương lai hoặc quỹ khẩn cấp.
 // ============================================================
+// ============================================================
+// JARS Smart Mapper — Phiên bản Toàn diện & Chính xác nhất
+// Chuẩn hóa theo hệ thống 6 chiếc lọ của T. Harv Eker
+// ============================================================
+
+// Hàm hỗ trợ loại bỏ dấu tiếng Việt
+const removeVietnameseTones = (str: string): string => {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
+    .toLowerCase()
+    .trim();
+};
+
+
+// Định nghĩa cấu trúc từ khóa cho các lọ
+const JAR_RULES = [
+  {
+    jar: "GIVE",
+    keywords: ["tu thien", "quyen gop", "cho di", "li xi", "mung tuoi", "bieu", "tang qua", "dam cuoi", "dam ma", "phung vieng", "tham om", "day thang"]
+  },
+  {
+    jar: "EDU",
+    keywords: ["hoc phi", "khoa hoc", "tien hoc", "mua sach", "sach giao khoa", "vo", "do dung hoc tap", "hoc them", "dao tao"]
+  },
+  {
+    jar: "FFA",
+    keywords: ["dau tu", "co phieu", "mua coin", "crypto", "chung khoan", "bat dong san", "vang mieng", "vang sjc", "chi vang"]
+  },
+  {
+    jar: "LTSS",
+    keywords: ["nhan vang", "kieng vang", "tiet kiem", "quy khan cap", "mua xe", "mua may tinh", "mua laptop", "mua dien thoai", "bao hiem nhan tho", "sua nha"]
+  },
+  {
+    jar: "PLAY",
+    keywords: ["giai tri", "xem phim", "choi game", "do choi", "du lich", "spa", "lam dep", "vay", "dam", "skirt", "my pham", "quan ao", "thoi trang", "cafe", "nhau", "tiec", "bar", "pub", "tra sua", "buffet", "an ngoai", "nha hang"]
+  },
+  {
+    jar: "NEC",
+    keywords: ["tra gop", "tra no", "tien goc", "tien lai", "ngan hang", "vay mua", "bao hiem y te", "bao hiem xe", "hoa don", "tien dien", "tien nuoc", "internet", "wifi", "chung cu", "tien mang", "di cho", "sieu thi", "thit", "ca", "rau", "gao", "xang", "gui xe", "thuoc", "kham benh", "vien phi", "bim", "sua"]
+  }
+];
 
 const mapToJar = (categoryName: string, description: string): string => {
-  const text = `${categoryName} ${description}`.toLowerCase();
-  
-  // --- 1. CHO ĐI (GIVE) ---
-  if (text.match(/(từ thiện|quyên góp|cho đi|lì xì|biếu|tặng quà|ủng hộ thiên tai|ủng hộ)/)) {
-    return "GIVE";
+  // 1. Gộp chuỗi và chuẩn hóa thành không dấu
+  const rawText = `${categoryName} ${description}`;
+  const normalizedText = removeVietnameseTones(rawText);
+
+  // 2. Duyệt qua từng quy tắc theo thứ tự ưu tiên trong mảng
+  for (const rule of JAR_RULES) {
+    // Kiểm tra xem có từ khóa nào trong danh sách xuất hiện trong chuỗi không
+    const isMatch = rule.keywords.some(keyword => normalizedText.includes(keyword));
+    if (isMatch) {
+      return rule.jar;
+    }
   }
 
-  // --- 2. GIÁO DỤC (EDU) ---
-  if (text.match(/(học phí|khóa học|tiền học|mua sách|sách giáo khoa|sách kỹ năng|seminar|training|chatgpt|midjourney|claude|tài khoản ai|phần mềm công việc|công cụ ai|tool làm việc)/)) {
-    return "EDU";
-  }
-
-  // --- 3. TỰ DO TÀI CHÍNH (FFA) ---
-  if (text.match(/(đầu tư cổ phiếu|mua coin|crypto|vốn kinh doanh|chứng khoán|cổ phần|quỹ đầu tư|etf|đầu tư đất)/)) {
-    return "FFA";
-  }
-
-  // --- 4. TIẾT KIỆM DÀI HẠN (LTSS) ---
-  if (text.match(/(quỹ khẩn cấp|quỹ dự phòng|tích lũy mua xe|tiết kiệm mua nhà|mua máy tính|mua laptop|mua điện thoại)/)) {
-    return "LTSS";
-  }
-
-  // --- 5. HƯỞNG THỤ (PLAY) ---
-  if (text.match(/(giải trí|mua váy|mua đồ đi cưới|mua giày đi chơi|xem phim|chơi game|du lịch|resort|spa|làm đẹp|làm tóc|café sang|nhậu|tiệc|bar|pub|vé số|truyện tranh)/)) {
-    return "PLAY";
-  }
-
-  // --- 6. MẶC ĐỊNH: THIẾT YẾU (NEC) ---
-  // Tự động bao gồm: tiền ăn, đi chợ, điện nước, xăng xe, bảo hiểm nhân thọ, 
-  // tiền trả góp mua nhà đang ở (gốc + lãi), đám cưới trả lễ, cắt tóc cơ bản...
+  // 3. Mặc định cuối cùng
   return "NEC";
 };
+
+
+// const mapToJar = (categoryName: string, description: string): string => {
+//   const text = `${categoryName} ${description}`.toLowerCase();
+  
+//   // --- ƯU TIÊN 1: CHO ĐI (GIVE) ---
+//   // Thêm các khoản giao tế, hiếu hỉ đặc thù của Việt Nam
+//   if (text.match(/(từ thiện|quyên góp|cho đi|lì xì|mừng tuổi|biếu|tặng quà|đám cưới|đám ma|phúng viếng|thăm ốm|đầy tháng|thăm đẻ)/)) {
+//     return "GIVE";
+//   }
+
+//   // --- ƯU TIÊN 2: GIÁO DỤC (EDU) ---
+//   // Thêm đồ dùng học tập, học thêm
+//   if (text.match(/(học phí|khóa học|tiền học|mua sách|sách giáo khoa|vở|đồ dùng học tập|học thêm|ngoại khóa|đào tạo)/)) {
+//     return "EDU";
+//   }
+
+//   // --- ƯU TIÊN 3: TỰ DO TÀI CHÍNH (FFA) ---
+//   if (text.match(/(đầu tư|cổ phiếu|mua coin|crypto|chứng khoán|đầu tư đất|bất động sản|vàng miếng|vàng sjc|chỉ vàng)/)) {
+//     return "FFA";
+//   }
+
+//   // --- ƯU TIÊN 4: TIẾT KIỆM DÀI HẠN & QUỸ KHẨN CẤP (LTSS) ---
+//   // Thay đổi "vàng" thành các cụm từ cụ thể để tránh lỗi "váy màu vàng"
+//   // Thêm bảo hiểm nhân thọ, sửa chữa lớn
+//   if (text.match(/(nhẫn vàng|kiềng vàng|vàng nhẫn|tiết kiệm|quỹ khẩn cấp|mua xe|mua máy tính|mua laptop|mua điện thoại|bảo hiểm nhân thọ|sửa nhà)/)) {
+//     return "LTSS";
+//   }
+
+//   // --- ƯU TIÊN 5: HƯỞNG THỤ (PLAY) ---
+//   // Phân biệt thời trang dạo phố (PLAY) với quần áo thiết yếu đi làm (có thể là NEC tùy quan điểm)
+//   if (text.match(/(giải trí|xem phim|chơi game|đồ chơi|du lịch|spa|làm đẹp|váy|đầm|skirt|mỹ phẩm|quần áo|thời trang|café|nhậu|tiệc|bar|pub|trà sữa|buffet|ăn ngoài|nhà hàng)/)) {
+//     return "PLAY";
+//   }
+
+//   // --- ƯU TIÊN 6: BỘ LỌC THIẾT YẾU CỐ ĐỊNH & SINH HOẠT (NEC) ---
+//   // Thêm Y tế, Bỉm sữa, Xăng xe, Đi chợ (bắt từ khóa rõ ràng để an toàn trước khi rơi vào Mặc định)
+//   if (text.match(/(trả góp|trả nợ|tiền gốc|tiền lãi|ngân hàng|vay mua|bảo hiểm y tế|bảo hiểm xe|hóa đơn|tiền điện|tiền nước|internet|wifi|chung cư|tiền mạng|đi chợ|siêu thị|thịt|cá|rau|gạo|xăng|gửi xe|thuốc|khám bệnh|viện phí|bỉm|sữa)/)) {
+//     return "NEC";
+//   }
+
+//   // --- MẶC ĐỊNH CUỐI CÙNG: THIẾT YẾU (NEC) ---
+//   // Mọi thứ không khớp ở trên sẽ vào đây. Bạn nên có cơ chế log lại các giao dịch rơi vào dòng này 
+//   // để định kỳ (mỗi tháng) xem lại và cập nhật thêm Regex cho các quỹ trên.
+//   return "NEC";
+// };
+
 export function JarsAnalysis() {
   const { dashboardData, transactions, currentMonth, currentYear } = useApp();
   const [expandedJar, setExpandedJar] = useState<string | null>(null);
