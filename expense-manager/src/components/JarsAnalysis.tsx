@@ -64,7 +64,7 @@ const OVERRIDE_RULES = [
   },
   {
     jar: "PLAY", // Lọ Hưởng thụ
-    regex: /\b(nhau|an nhau|tiec|buffet|nha hang|lien hoan|bo nuong|banh kem|cafe|bar|pub|tra sua|giai tri|xem phim|du lich|spa|lam dep|vay|dam|skirt|my pham|hoi thao|the thao|gym|cuoi|dam cuoi|an cuoi|day thang|sinh nhat)\b/
+    regex: /\b(nhau|an nhau|tiec|buffet|nha hang|lien hoan|bo nuong|banh kem|cafe|bar|pub|tra sua|giai tri|xem phim|du lich|spa|lam dep|vay|dam|skirt|my pham|hoi thao|the thao|gym|di dam cuoi|di an cuoi|day thang|sinh nhat)\b/
   }
 ];
 
