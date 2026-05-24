@@ -35,38 +35,35 @@ const normalizeText = (str: string): string => {
     .trim();
 };
 
+// 6. GIVE - Lọ Cho đi (5%): Dành cho sự bao dung và vị tha. Bao gồm làm từ thiện, quyên góp bão lụt, biếu tặng những người có hoàn cảnh khó khăn vô điều kiện.
+// 5. PLAY - Lọ Hưởng thụ (10%): Dành cho việc chăm sóc tinh thần và ngoại giao. Bao gồm ăn nhà hàng, du lịch, xem phim, làm đẹp, và các khoản giao tế (đi đám cưới, sinh nhật, hội thao).
+// 4. FFA - Lọ Tự do tài chính (10%): Dành cho đầu tư sinh lời. Bao gồm mua cổ phiếu, góp vốn kinh doanh, mua đất. Nguyên tắc: Chỉ dùng để tiền đẻ ra tiền, không bao giờ được rút vốn để tiêu xài.
+// 3. EDU - Lọ Giáo dục (10%): Dành cho việc học tập và phát triển bản thân. Bao gồm tiền học phí cho con, khóa học nâng cao kỹ năng cho vợ/chồng, mua sách.
+// 2. LTSS - Lọ Tiết kiệm dài hạn & Dự phòng (10%): Dành cho các khoản chi lớn trong tương lai hoặc biến cố. Bao gồm mua đồ gia dụng lớn (tivi, xe máy), quỹ khẩn cấp ốm đau (viện phí nặng), mua vàng cất giữ phòng thân.
+
 // 2. Định nghĩa bộ TỪ KHÓA GHI ĐÈ (Override Keywords)
 // Dùng regex \b (Word boundary) để đảm bảo khớp chính xác nguyên 1 từ, không bắt chữ lộn xộn.
 const OVERRIDE_RULES = [
   {
-    // 3. EDU - Lọ Giáo dục (10%): Dành cho việc học tập và phát triển bản thân. Bao gồm tiền học phí cho con, khóa học nâng cao kỹ năng cho vợ/chồng, mua sách.
-    jar: "EDU",
-    // Bắt chính xác: hoc phi, sach, khoa hoc...
+    jar: "EDU", // Lọ Giáo dục
     regex: /\b(hoc phi|khoa hoc|tien hoc|mua sach|sach giao khoa|hoc them|dao tao)\b/
   },
   {
-
-    // 4. FFA - Lọ Tự do tài chính (10%): Dành cho đầu tư sinh lời. Bao gồm mua cổ phiếu, góp vốn kinh doanh, mua đất. Nguyên tắc: Chỉ dùng để tiền đẻ ra tiền, không bao giờ được rút vốn để tiêu xài.
-    jar: "FFA",
-    // Bắt chính xác: chung khoan, crypto, vang mieng...
-    regex: /\b(dau tu|co phieu|crypto|chung khoan|bat dong san|vang mieng|vang sjc|chi vang)\b/
+    jar: "FFA", // Lọ Tự do Tài chính
+    // ĐÃ XÓA: vang mieng, vang sjc, chi vang ra khỏi đây để không bị nhận diện nhầm
+    regex: /\b(dau tu|co phieu|crypto|chung khoan|bat dong san)\b/
   },
   {
-    // 2. LTSS - Lọ Tiết kiệm dài hạn & Dự phòng (10%): Dành cho các khoản chi lớn trong tương lai hoặc biến cố. Bao gồm mua đồ gia dụng lớn (tivi, xe máy), quỹ khẩn cấp ốm đau (viện phí nặng), mua vàng cất giữ phòng thân.
-    jar: "LTSS",
-    // Quỹ khẩn cấp, bảo hiểm, sửa nhà, mua sắm tài sản lớn
-    regex: /\b(nhan vang|kieng vang|tiet kiem|quy khan cap|mua xe|mua may tinh|mua laptop|dien thoai|bao hiem nhan tho|sua nha|kham benh|vien phi)\b/
+    jar: "LTSS", // Lọ Tiết kiệm Dài hạn & Dự phòng
+    // ĐÀ THÊM: mua vang, vang mieng, vang sjc, chi vang vào nhóm này
+    regex: /\b(mua vang|vang mieng|vang sjc|chi vang|nhan vang|kieng vang|vang nhan|tiet kiem|quy khan cap|mua xe|mua may tinh|mua laptop|dien thoai|tivi|may giat|tu lanh|dieu hoa|bao hiem nhan tho|sua nha|kham benh|vien phi)\b/
   },
   {
-    // 6. GIVE - Lọ Cho đi (5%): Dành cho sự bao dung và vị tha. Bao gồm làm từ thiện, quyên góp bão lụt, biếu tặng những người có hoàn cảnh khó khăn vô điều kiện.
-    jar: "GIVE",
-    // Chỉ từ thiện thực sự
+    jar: "GIVE", // Lọ Cho đi
     regex: /\b(tu thien|quyen gop|cho di|bieu xen|ung ho)\b/
   },
   {
-    // 5. PLAY - Lọ Hưởng thụ (10%): Dành cho việc chăm sóc tinh thần và ngoại giao. Bao gồm ăn nhà hàng, du lịch, xem phim, làm đẹp, và các khoản giao tế (đi đám cưới, sinh nhật, hội thao).
-    jar: "PLAY",
-    // Đưa TẤT CẢ ăn chơi, hiếu hỉ, giao tế vào đây để bảo vệ quỹ NEC
+    jar: "PLAY", // Lọ Hưởng thụ
     regex: /\b(nhau|an nhau|tiec|buffet|nha hang|bo nuong|banh kem|cafe|bar|pub|tra sua|giai tri|xem phim|du lich|spa|lam dep|vay|dam|skirt|my pham|hoi thao|the thao|gym|cuoi|dam cuoi|day thang|sinh nhat)\b/
   }
 ];
