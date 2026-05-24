@@ -5,12 +5,12 @@ import { AlertCircle, CheckCircle2, TrendingUp, Info, Home, LineChart, PiggyBank
 import { useApp } from "@/context/AppContext";
 
 const JARS = [
-  { id: "NEC", name: "Thiết yếu", pct: 0.55, color: "bg-blue-500", text: "text-blue-500", desc: "Ăn uống, nhà ở, hóa đơn...", icon: Home, info: "Quỹ Thiết yếu (55%): Phục vụ nhu cầu sinh hoạt hàng ngày (ăn uống, đi lại, điện nước). Nếu quỹ này thường xuyên vượt quá 80%, bạn cần phải đánh giá lại lối sống hoặc tìm cách tăng thu nhập." },
-  { id: "FFA", name: "Tự do Tài chính", pct: 0.10, color: "bg-emerald-500", text: "text-emerald-500", desc: "Đầu tư, kinh doanh...", icon: LineChart, info: "Quỹ Tự do Tài chính (10%): Đây là 'ngỗng đẻ trứng vàng'. Tiền này chỉ dùng để đầu tư tạo ra thu nhập thụ động, tuyệt đối không được lấy ra tiêu xài." },
-  { id: "LTSS", name: "Tiết kiệm Dài hạn", pct: 0.10, color: "bg-indigo-500", text: "text-indigo-500", desc: "Quỹ dự phòng, mua xe...", icon: PiggyBank, info: "Quỹ Tiết kiệm Dài hạn (10%): Dùng cho các mục tiêu lớn (mua nhà, mua xe) hoặc quỹ dự phòng khẩn cấp. Rất quan trọng để đảm bảo an toàn tài chính." },
-  { id: "EDU", name: "Giáo dục", pct: 0.10, color: "bg-amber-500", text: "text-amber-500", desc: "Học tập, mua sách...", icon: GraduationCap, info: "Quỹ Giáo dục (10%): Đầu tư vào bản thân là khoản đầu tư sinh lời nhất. Dùng để mua sách, học khóa học mới, nâng cao kỹ năng." },
-  { id: "PLAY", name: "Hưởng thụ", pct: 0.10, color: "bg-rose-500", text: "text-rose-500", desc: "Du lịch, mua sắm...", icon: Coffee, info: "Quỹ Hưởng thụ (10%): Bắt buộc phải tiêu hết quỹ này mỗi tháng để tự thưởng cho bản thân, giúp duy trì động lực kiếm tiền (du lịch, ăn nhà hàng sang, spa)." },
-  { id: "GIVE", name: "Cho đi", pct: 0.05, color: "bg-teal-500", text: "text-teal-500", desc: "Từ thiện, quà tặng...", icon: Heart, info: "Quỹ Cho đi (5%): Giúp đỡ người thân, từ thiện, quà tặng. Cho đi để nhận lại nhiều hơn." },
+  { id: "NEC", name: "Thiết yếu", pct: 0.55, color: "bg-blue-500", text: "text-blue-500", desc: "Ăn uống, nhà ở, hóa đơn...", icon: Home, info: "Quỹ Thiết yếu (55%): Phục vụ nhu cầu sinh hoạt hàng ngày. Dành cho sinh tồn cơ bản. Bao gồm tiền ăn uống, đi chợ, điện nước, xăng xe, nhà ở, trả góp ngân hàng hàng tháng. Nếu quỹ này thường xuyên vượt quá 80%, bạn cần phải đánh giá lại lối sống hoặc tìm cách tăng thu nhập." },
+  { id: "FFA", name: "Tự do Tài chính", pct: 0.10, color: "bg-emerald-500", text: "text-emerald-500", desc: "Đầu tư, kinh doanh...", icon: LineChart, info: "Quỹ Tự do Tài chính (10%): Đây là 'ngỗng đẻ trứng vàng'. Dành cho đầu tư sinh lời. Bao gồm mua cổ phiếu, góp vốn kinh doanh, mua đất. Tiền này chỉ dùng để đầu tư tạo ra thu nhập thụ động, tuyệt đối không được lấy ra tiêu xài." },
+  { id: "LTSS", name: "Tiết kiệm Dài hạn", pct: 0.10, color: "bg-indigo-500", text: "text-indigo-500", desc: "Quỹ dự phòng, mua xe...", icon: PiggyBank, info: "Quỹ Tiết kiệm dài hạn & Dự phòng (10%): Dành cho các khoản chi lớn trong tương lai hoặc biến cố. Bao gồm mua đồ gia dụng lớn (tivi, xe máy), quỹ khẩn cấp ốm đau (viện phí nặng), mua vàng cất giữ phòng thân. Rất quan trọng để đảm bảo an toàn tài chính." },
+  { id: "EDU", name: "Giáo dục", pct: 0.10, color: "bg-amber-500", text: "text-amber-500", desc: "Học tập, mua sách...", icon: GraduationCap, info: "Quỹ Giáo dục (10%): Đầu tư vào bản thân là khoản đầu tư sinh lời nhất. Bao gồm tiền học phí cho con, khóa học nâng cao kỹ năng cho vợ/chồng, mua sách." },
+  { id: "PLAY", name: "Hưởng thụ", pct: 0.10, color: "bg-rose-500", text: "text-rose-500", desc: "Du lịch, mua sắm...", icon: Coffee, info: "Quỹ Hưởng thụ (10%): Bắt buộc phải tiêu hết quỹ này mỗi tháng để tự thưởng cho bản thân, giúp duy trì động lực kiếm tiền (du lịch, ăn nhà hàng sang, spa, xem phim, làm đẹp, và các khoản giao tiếp)." },
+  { id: "GIVE", name: "Cho đi", pct: 0.05, color: "bg-teal-500", text: "text-teal-500", desc: "Từ thiện, quà tặng...", icon: Heart, info: "Quỹ Cho đi (5%): Dành cho sự bao dung và vị tha. Bao gồm làm từ thiện, quyên góp bão lụt, biếu tặng những người có hoàn cảnh khó khăn vô điều kiện.Giúp đỡ người thân, từ thiện, quà tặng. Cho đi để nhận lại nhiều hơn." },
 ];
 // ============================================================
 // JARS Smart Mapper — Chuẩn hóa theo T. Harv Eker
@@ -39,26 +39,32 @@ const normalizeText = (str: string): string => {
 // Dùng regex \b (Word boundary) để đảm bảo khớp chính xác nguyên 1 từ, không bắt chữ lộn xộn.
 const OVERRIDE_RULES = [
   {
+    // 3. EDU - Lọ Giáo dục (10%): Dành cho việc học tập và phát triển bản thân. Bao gồm tiền học phí cho con, khóa học nâng cao kỹ năng cho vợ/chồng, mua sách.
     jar: "EDU",
     // Bắt chính xác: hoc phi, sach, khoa hoc...
     regex: /\b(hoc phi|khoa hoc|tien hoc|mua sach|sach giao khoa|hoc them|dao tao)\b/
   },
   {
+
+    // 4. FFA - Lọ Tự do tài chính (10%): Dành cho đầu tư sinh lời. Bao gồm mua cổ phiếu, góp vốn kinh doanh, mua đất. Nguyên tắc: Chỉ dùng để tiền đẻ ra tiền, không bao giờ được rút vốn để tiêu xài.
     jar: "FFA",
     // Bắt chính xác: chung khoan, crypto, vang mieng...
     regex: /\b(dau tu|co phieu|crypto|chung khoan|bat dong san|vang mieng|vang sjc|chi vang)\b/
   },
   {
+    // 2. LTSS - Lọ Tiết kiệm dài hạn & Dự phòng (10%): Dành cho các khoản chi lớn trong tương lai hoặc biến cố. Bao gồm mua đồ gia dụng lớn (tivi, xe máy), quỹ khẩn cấp ốm đau (viện phí nặng), mua vàng cất giữ phòng thân.
     jar: "LTSS",
     // Quỹ khẩn cấp, bảo hiểm, sửa nhà, mua sắm tài sản lớn
     regex: /\b(nhan vang|kieng vang|tiet kiem|quy khan cap|mua xe|mua may tinh|mua laptop|dien thoai|bao hiem nhan tho|sua nha|kham benh|vien phi)\b/
   },
   {
+    // 6. GIVE - Lọ Cho đi (5%): Dành cho sự bao dung và vị tha. Bao gồm làm từ thiện, quyên góp bão lụt, biếu tặng những người có hoàn cảnh khó khăn vô điều kiện.
     jar: "GIVE",
     // Chỉ từ thiện thực sự
     regex: /\b(tu thien|quyen gop|cho di|bieu xen|ung ho)\b/
   },
   {
+    // 5. PLAY - Lọ Hưởng thụ (10%): Dành cho việc chăm sóc tinh thần và ngoại giao. Bao gồm ăn nhà hàng, du lịch, xem phim, làm đẹp, và các khoản giao tế (đi đám cưới, sinh nhật, hội thao).
     jar: "PLAY",
     // Đưa TẤT CẢ ăn chơi, hiếu hỉ, giao tế vào đây để bảo vệ quỹ NEC
     regex: /\b(nhau|an nhau|tiec|buffet|nha hang|bo nuong|banh kem|cafe|bar|pub|tra sua|giai tri|xem phim|du lich|spa|lam dep|vay|dam|skirt|my pham|hoi thao|the thao|gym|cuoi|dam cuoi|day thang|sinh nhat)\b/
@@ -90,6 +96,7 @@ const mapToJar = (categoryName: string, description: string): string => {
   // Xử lý các category chung chung (Tiền ăn, tiền nhà, hóa đơn, bỉm sữa, xăng xe)
   const isNecCategory = /\b(an uong|di lai|nha o|hoa don|dien nuoc|internet|wifi|sieu thi|di cho|xang|gui xe|bim|sua|thit|ca|rau|ngan hang|tra no|tien lai)\b/;
   
+  // 1. NEC - Lọ Thiết yếu (55%): Dành cho sinh tồn cơ bản. Bao gồm tiền ăn uống, đi chợ, điện nước, xăng xe, nhà ở, trả góp ngân hàng hàng tháng.
   if (isNecCategory.test(normCategory) || isNecCategory.test(normDesc)) {
     return "NEC"; 
   }
