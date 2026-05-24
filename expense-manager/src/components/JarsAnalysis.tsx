@@ -23,9 +23,9 @@ const JARS = [
 // JARS Smart Mapper — Phiên bản Toàn diện & Chính xác nhất
 // Chuẩn hóa theo hệ thống 6 chiếc lọ của T. Harv Eker
 // ============================================================
-
-// Hàm hỗ trợ loại bỏ dấu tiếng Việt
-const removeVietnameseTones = (str: string): string => {
+// 1. Hàm chuẩn hóa: Bỏ dấu tiếng Việt, đưa về chữ thường
+const normalizeText = (str: string): string => {
+  if (!str) return "";
   return str
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -35,53 +35,69 @@ const removeVietnameseTones = (str: string): string => {
     .trim();
 };
 
-
-// Định nghĩa cấu trúc từ khóa cho các lọ
-const JAR_RULES = [
-  {
-    jar: "GIVE",
-    keywords: ["tu thien", "quyen gop", "cho di", "li xi", "mung tuoi", "bieu", "tang qua", "dam cuoi", "dam ma", "phung vieng", "tham om", "day thang"]
-  },
+// 2. Định nghĩa bộ TỪ KHÓA GHI ĐÈ (Override Keywords)
+// Dùng regex \b (Word boundary) để đảm bảo khớp chính xác nguyên 1 từ, không bắt chữ lộn xộn.
+const OVERRIDE_RULES = [
   {
     jar: "EDU",
-    keywords: ["hoc phi", "khoa hoc", "tien hoc", "mua sach", "sach giao khoa", "vo", "do dung hoc tap", "hoc them", "dao tao"]
+    // Bắt chính xác: hoc phi, sach, khoa hoc...
+    regex: /\b(hoc phi|khoa hoc|tien hoc|mua sach|sach giao khoa|hoc them|dao tao)\b/
   },
   {
     jar: "FFA",
-    keywords: ["dau tu", "co phieu", "mua coin", "crypto", "chung khoan", "bat dong san", "vang mieng", "vang sjc", "chi vang"]
+    // Bắt chính xác: chung khoan, crypto, vang mieng...
+    regex: /\b(dau tu|co phieu|crypto|chung khoan|bat dong san|vang mieng|vang sjc|chi vang)\b/
   },
   {
     jar: "LTSS",
-    keywords: ["nhan vang", "kieng vang", "tiet kiem", "quy khan cap", "mua xe", "mua may tinh", "mua laptop", "mua dien thoai", "bao hiem nhan tho", "sua nha"]
+    // Quỹ khẩn cấp, bảo hiểm, sửa nhà, mua sắm tài sản lớn
+    regex: /\b(nhan vang|kieng vang|tiet kiem|quy khan cap|mua xe|mua may tinh|mua laptop|dien thoai|bao hiem nhan tho|sua nha|kham benh|vien phi)\b/
+  },
+  {
+    jar: "GIVE",
+    // Chỉ từ thiện thực sự
+    regex: /\b(tu thien|quyen gop|cho di|bieu xen|ung ho)\b/
   },
   {
     jar: "PLAY",
-    keywords: ["giai tri", "xem phim", "choi game", "do choi", "du lich", "spa", "lam dep", "vay", "dam", "skirt", "my pham", "quan ao", "thoi trang", "cafe", "nhau", "tiec", "bar", "pub", "tra sua", "buffet", "an ngoai", "nha hang"]
-  },
-  {
-    jar: "NEC",
-    keywords: ["tra gop", "tra no", "tien goc", "tien lai", "ngan hang", "vay mua", "bao hiem y te", "bao hiem xe", "hoa don", "tien dien", "tien nuoc", "internet", "wifi", "chung cu", "tien mang", "di cho", "sieu thi", "thit", "ca", "rau", "gao", "xang", "gui xe", "thuoc", "kham benh", "vien phi", "bim", "sua"]
+    // Đưa TẤT CẢ ăn chơi, hiếu hỉ, giao tế vào đây để bảo vệ quỹ NEC
+    regex: /\b(nhau|an nhau|tiec|buffet|nha hang|bo nuong|banh kem|cafe|bar|pub|tra sua|giai tri|xem phim|du lich|spa|lam dep|vay|dam|skirt|my pham|hoi thao|the thao|gym|cuoi|dam cuoi|day thang|sinh nhat)\b/
   }
 ];
 
+// 3. Logic chính xử lý
 const mapToJar = (categoryName: string, description: string): string => {
-  // 1. Gộp chuỗi và chuẩn hóa thành không dấu
-  const rawText = `${categoryName} ${description}`;
-  const normalizedText = removeVietnameseTones(rawText);
+  const normCategory = normalizeText(categoryName);
+  const normDesc = normalizeText(description);
 
-  // 2. Duyệt qua từng quy tắc theo thứ tự ưu tiên trong mảng
-  for (const rule of JAR_RULES) {
-    // Kiểm tra xem có từ khóa nào trong danh sách xuất hiện trong chuỗi không
-    const isMatch = rule.keywords.some(keyword => normalizedText.includes(keyword));
-    if (isMatch) {
+  // BƯỚC 1: ƯU TIÊN GHI CHÚ (DESCRIPTION OVERRIDE)
+  // Nếu người dùng viết "Ăn nhậu" trong phần ghi chú, nó PHẢI LÀ PLAY, bất kể category là gì.
+  for (const rule of OVERRIDE_RULES) {
+    if (rule.regex.test(normDesc)) {
       return rule.jar;
     }
   }
 
-  // 3. Mặc định cuối cùng
-  return "NEC";
-};
+  // BƯỚC 2: XÉT ĐẾN DANH MỤC LỚN (CATEGORY MAP)
+  // Chỉ chạy khi Ghi chú không có từ khóa đặc biệt nào
+  for (const rule of OVERRIDE_RULES) {
+    if (rule.regex.test(normCategory)) {
+      return rule.jar;
+    }
+  }
 
+  // BƯỚC 3: MẶC ĐỊNH BẢO VỆ (SAFE FALLBACK)
+  // Xử lý các category chung chung (Tiền ăn, tiền nhà, hóa đơn, bỉm sữa, xăng xe)
+  const isNecCategory = /\b(an uong|di lai|nha o|hoa don|dien nuoc|internet|wifi|sieu thi|di cho|xang|gui xe|bim|sua|thit|ca|rau|ngan hang|tra no|tien lai)\b/;
+  
+  if (isNecCategory.test(normCategory) || isNecCategory.test(normDesc)) {
+    return "NEC"; 
+  }
+
+  // Nếu không lọt vào bất kỳ đâu, trả về NEC (Thiết yếu) nhưng bạn nên làm 1 lọ "OTHER" 
+  // trên UI để biết mà phân loại lại thủ công.
+  return "NEC"; 
+};
 
 // const mapToJar = (categoryName: string, description: string): string => {
 //   const text = `${categoryName} ${description}`.toLowerCase();
