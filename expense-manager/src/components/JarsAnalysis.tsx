@@ -12,40 +12,47 @@ const JARS = [
   { id: "PLAY", name: "Hưởng thụ", pct: 0.10, color: "bg-rose-500", text: "text-rose-500", desc: "Du lịch, mua sắm...", icon: Coffee, info: "Quỹ Hưởng thụ (10%): Bắt buộc phải tiêu hết quỹ này mỗi tháng để tự thưởng cho bản thân, giúp duy trì động lực kiếm tiền (du lịch, ăn nhà hàng sang, spa)." },
   { id: "GIVE", name: "Cho đi", pct: 0.05, color: "bg-teal-500", text: "text-teal-500", desc: "Từ thiện, quà tặng...", icon: Heart, info: "Quỹ Cho đi (5%): Giúp đỡ người thân, từ thiện, quà tặng. Cho đi để nhận lại nhiều hơn." },
 ];
+// ============================================================
+// JARS Smart Mapper — Chuẩn hóa theo T. Harv Eker
+// Logic tài chính chính thống:
+//   - NEC (55%): Chi phí sinh tồn, hóa đơn, bảo hiểm, trả góp nhà đang ở (gốc + lãi).
+//   - FFA (10%): Đầu tư sinh lời, tạo thu nhập thụ động (không bao giờ tiêu gốc).
+//   - LTSS (10%): Tích lũy cho các khoản chi tiêu lớn trong tương lai hoặc quỹ khẩn cấp.
+// ============================================================
 
-// ============================================================
-// JARS Smart Mapper — Phân loại chi tiêu vào đúng chiếc lọ
-// Logic tài chính:
-//   - Tiền lãi vay (mortgage interest) = CHI PHÍ thực sự ⇒ NEC
-//   - Tiền gốc vay (mortgage principal) = XÂY DỰNG TÀI SẢN ⇒ LTSS
-//   - Đầu tư (stocks, coin...) = TẠO THU NHẬP THỤ ĐỐNG ⇒ FFA
-// ============================================================
 const mapToJar = (categoryName: string, description: string): string => {
-  // Gộp cả tên danh mục và ghi chú lại để quét một thể
   const text = `${categoryName} ${description}`.toLowerCase();
   
-  // --- Lọ 1: CHO ĐI (5%) ---
-  if (text.match(/(từ thiện|cho đi|quà|tặng|lì xì|biếu|hỗ trợ)/)) return "GIVE";
+  // --- 1. CHO ĐI (GIVE) ---
+  if (text.match(/(từ thiện|quyên góp|cho đi|lì xì|biếu|tặng quà|ủng hộ thiên tai|ủng hộ)/)) {
+    return "GIVE";
+  }
 
-  // --- Lọ 2: GIÁO DỤC (10%) ---
-  if (text.match(/(học|sách|khóa học|giáo dục|training|lộ phí|tiền học|học phí)/)) return "EDU";
+  // --- 2. GIÁO DỤC (EDU) ---
+  if (text.match(/(học phí|khóa học|tiền học|mua sách|sách giáo khoa|sách kỹ năng|seminar|training|chatgpt|midjourney|claude|tài khoản ai|phần mềm công việc|công cụ ai|tool làm việc)/)) {
+    return "EDU";
+  }
 
-  // --- Lọ 3: TỰ DO TÀI CHÍNH (10%) ---
-  if (text.match(/(đầu tư|ổ phiếu|coin|crypto|kinh doanh|chứng khoán|cổ phần|quỹ đầu tư|etf|real estate)/)) return "FFA";
+  // --- 3. TỰ DO TÀI CHÍNH (FFA) ---
+  if (text.match(/(đầu tư cổ phiếu|mua coin|crypto|vốn kinh doanh|chứng khoán|cổ phần|quỹ đầu tư|etf|đầu tư đất)/)) {
+    return "FFA";
+  }
 
-  // --- Lọ 4: TIẮT KIỆM DÀI HẠN (10%) ---
-  // QUAN TRỌANG: Tiền GỐC trả ngân hàng = xây dựng tài sản (equity) ⇒ phân loại là LTSS
-  // Tiền LÃI trả ngân hàng = chi phí thực, không có gì lại ⇒ phân loại là NEC
-  if (text.match(/(tiết kiệm|bảo hiểm|dự phòng|quỹ khẩn cấp|tiền gốc|trả gốc|gốc vay|gốc ngân hàng|trả nợ gốc|gốc nhà|gốc xe)/)) return "LTSS";
+  // --- 4. TIẾT KIỆM DÀI HẠN (LTSS) ---
+  if (text.match(/(quỹ khẩn cấp|quỹ dự phòng|tích lũy mua xe|tiết kiệm mua nhà|mua máy tính|mua laptop|mua điện thoại)/)) {
+    return "LTSS";
+  }
 
-  // --- Lọ 5: HƯỜNG THỤ (10%) ---
-  if (text.match(/(giải trí|xem phim|game|du lịch|mùa hè|resort|spa|mua sắm|quần áo|thời trang|làm đẹp|cắt tóc|nhà hàng|café sang|chơi|nhậu)/)) return "PLAY";
+  // --- 5. HƯỞNG THỤ (PLAY) ---
+  if (text.match(/(giải trí|mua váy|mua đồ đi cưới|mua giày đi chơi|xem phim|chơi game|du lịch|resort|spa|làm đẹp|làm tóc|café sang|nhậu|tiệc|bar|pub|vé số|truyện tranh)/)) {
+    return "PLAY";
+  }
 
-  // --- Mặc định: THIẾT Yếu (55%) ---
-  // Gồm: ăn uống, đi lại, điện nước, cưới hỏi, tiền lãi vay (mortgage interest), nhà cửa (tiền thuê, sửa chữa)
+  // --- 6. MẶC ĐỊNH: THIẾT YẾU (NEC) ---
+  // Tự động bao gồm: tiền ăn, đi chợ, điện nước, xăng xe, bảo hiểm nhân thọ, 
+  // tiền trả góp mua nhà đang ở (gốc + lãi), đám cưới trả lễ, cắt tóc cơ bản...
   return "NEC";
 };
-
 export function JarsAnalysis() {
   const { dashboardData, transactions, currentMonth, currentYear } = useApp();
   const [expandedJar, setExpandedJar] = useState<string | null>(null);

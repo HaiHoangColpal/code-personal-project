@@ -5,7 +5,7 @@ import { Baby, PieChart as PieChartIcon } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 
 // Các từ khóa nhận diện chi phí cho con cái (Áp dụng cho cả Tên Danh mục và Mô tả giao dịch)
-const KIDS_KEYWORDS = /(sữa|bỉm|con|trẻ|bé|đồ chơi|truyện|nhà trẻ|mẫu giáo|học phí)/i;
+const KIDS_KEYWORDS = /(sữa|bỉm|con|trẻ|bé|đồ chơi|truyện|nhà trẻ|mẫu giáo|học phí|giáo khoa|tiểu học|trung học|học thêm)/i;
 
 export function FamilyAnalysis() {
   const { dashboardData, transactions, currentMonth, currentYear } = useApp();

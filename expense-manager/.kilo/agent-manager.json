@@ -1,0 +1,24 @@
+{
+  "worktrees": {
+    "wt-1779605620846-1": {
+      "branch": "quilt-cornet",
+      "path": "c:\\NodeJS\\test_form_personal\\.kilo\\worktrees\\quilt-cornet",
+      "parentBranch": "feature/review-before-merge",
+      "createdAt": "2026-05-24T06:53:40.846Z"
+    }
+  },
+  "sessions": {
+    "ses_1a73d32f1ffelYu1fjSsmt1Aef": {
+      "worktreeId": "wt-1779605620846-1",
+      "createdAt": "2026-05-24T06:53:42.035Z"
+    }
+  },
+  "tabOrder": {
+    "local": [
+      "pending:1"
+    ]
+  },
+  "worktreeOrder": [
+    "wt-1779605620846-1"
+  ]
+}
